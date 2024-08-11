@@ -1,121 +1,21 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import ProductDialog from "./ProductDialog.vue";
 import type { IProduct } from "@/types/product.types";
+import axios from "axios";
 
-const productArray = ref<IProduct[]>([
-  {
-    name: "shoes1",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    _id: " 1",
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-    category: "shoes",
-  },
-  {
-    name: "shoes2",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    _id: "2",
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    category: "shoes",
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-  },
-  {
-    name: "shoes3",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    _id: "1",
-
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-    category: "shoes",
-  },
-  {
-    name: "shoes4",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    _id: "4",
-
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-    category: "shoes",
-  },
-]);
+const products = ref<IProduct[]>([]);
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get<IProduct[]>(
+      "http://localhost:4000/api/products"
+    );
+    products.value = response.data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
 const isModalOpen = ref(false);
 const selectedProduct = ref(null);
 
@@ -123,6 +23,8 @@ const openModal = (product: any) => {
   selectedProduct.value = product;
   isModalOpen.value = true;
 };
+
+onMounted(fetchProducts);
 </script>
 <template>
   <main class="mx-auto my-6 px-10">
@@ -131,7 +33,7 @@ const openModal = (product: any) => {
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
     >
       <section
-        v-for="product in productArray"
+        v-for="product in products"
         :key="product._id"
         class="w-[90%] mx-auto my-6"
       >

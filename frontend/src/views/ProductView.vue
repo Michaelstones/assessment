@@ -1,129 +1,24 @@
 <script lang="ts" setup>
 import type { IProduct } from "@/types/product.types";
 import ProductDialog from "../components/ProductDialog.vue";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
 
-const productArray = ref<IProduct[]>([
-  {
-    name: "shoes1",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    id: 1,
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 1,
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 2,
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-    category: "shoes",
-  },
-  {
-    name: "shoes2",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    id: 2,
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 1,
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 2,
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    category: "shoes",
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-  },
-  {
-    name: "shoes3",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    id: 3,
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 1,
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 2,
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-    category: "shoes",
-  },
-  {
-    name: "shoes4",
-    imgUrl:
-      "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-    id: 4,
-    color: [
-      {
-        name: "black",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 1,
-      },
-      {
-        name: "blue",
-        imgUrl:
-          "https://res.cloudinary.com/knesset-groups/image/upload/v1654893439/cld-sample-5.jpg",
-        id: 2,
-      },
-    ],
-    description: "good nike shoes",
-    price: 200,
-    material: ["nylon", "teflon", "cotton"],
-    size: [
-      { name: "M", qty: 20 },
-      { name: "L", qty: 20 },
-      { name: "XL", qty: 20 },
-    ],
-    category: "shoes",
-  },
-]);
+const products = ref<IProduct[]>([]);
 
 const isModalOpen = ref(false);
 const selectedProduct = ref<IProduct | null>(null);
+
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get<IProduct[]>(
+      "http://localhost:4000/api/products"
+    );
+    products.value = response.data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
 
 const openModal = (product: any) => {
   selectedProduct.value = product;
@@ -136,12 +31,14 @@ const searchQuery = ref<string>("");
 // Computed property for filtered products
 const filteredProducts = computed(() => {
   if (!searchQuery.value) {
-    return productArray.value;
+    return products.value;
   }
-  return productArray.value.filter((product) =>
+  return products.value.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
+
+onMounted(fetchProducts);
 </script>
 
 <template>
@@ -167,7 +64,7 @@ const filteredProducts = computed(() => {
     >
       <section
         v-for="product in filteredProducts"
-        :key="product.id"
+        :key="product._id"
         class="w-[90%] mx-auto my-6"
       >
         <div class="group image-card">
@@ -191,7 +88,7 @@ const filteredProducts = computed(() => {
             <p>NGN{{ product.price }}</p>
           </div>
           <div
-            :data-id="product.id"
+            :data-id="product._id"
             id="product_btn"
             class="cursor-pointer border border-gray-400 px-6 py-2 w-full text-center all-btn"
           >
